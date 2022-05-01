@@ -13,7 +13,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 public class IMDBStudent20191765 {
 	
 	public static class IMDBMapper extends Mapper<LongWritable,  Text, Text, IntWritable> {
-		private String Text g_key = new Text();
+		private Text g_key = new Text();
 		private IntWritable one = new IntWritable(1);
 
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {

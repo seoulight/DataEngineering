@@ -13,8 +13,8 @@ import org.apache.hadoop.util.GenericOptionsParser;
 public class UBERStudent20191765 {
 	
 	public static class UBERMapper extends Mapper<LongWritable, Text, Text, Text> {
-		private String Text u_key = new Text();
-		private String Text u_value = new Text();
+		private Text u_key = new Text();
+		private Text u_value = new Text();
 		private String[] week = {"SUN", "MON", "TUE", "WED", "THR", "FRI", "SAT"};
 		private Calendar calendar = Calendar.getInstance(); 
 
