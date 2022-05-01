@@ -30,11 +30,11 @@ public class UBERStudent20191765 {
 		}
 	}
 
-	public static class UBERReducer extends Reducer<Text, Iterable<Text>, Text, Text> {
-		private int sum[] = {0, 0};
+	public static class UBERReducer extends Reducer<Text, Text, Text, Text> {
 		private Text result = new Text();
 
 		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+			int[] sum = {0, 0};
 			for (Text v : values) {
 				String[] splitValues = v.toString().split(",");
 				sum[0] += Integer.parseInt(splitValues[0]);
@@ -45,9 +45,9 @@ public class UBERStudent20191765 {
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		Configuration conf = new Configuration();
-		String[] otherArgs = new GenericOptionParser(conf, args).getRemainingArgs();
+		String[] otherArgs = new GenericOptionsParser(conf, args).getRemainingArgs();
 		if (otherArgs.length != 2)
 		{
 			System.exit(2);
@@ -56,10 +56,10 @@ public class UBERStudent20191765 {
 		Job job = new Job(conf, "uber student20191765");
 		job.setJarByClass(UBERStudent20191765.class);
 		job.setMapperClass(UBERMapper.class);
+		job.setCombinerClass(UBERReducer.class);
 		job.setReducerClass(UBERReducer.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
-		job.setInputFormatClass(TextInputFormat.class);
 		FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 		FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 
