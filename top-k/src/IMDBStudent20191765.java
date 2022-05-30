@@ -46,7 +46,7 @@ public class IMDBStudent20191765 {
 
 	public static class IMDBReducer extends Reducer<Text, Text, Text, DoubleWritable> {
 
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 			Text reduce_key = new Text();
 			Text reduce_result = new Text();
 			double sum = 0.0;
