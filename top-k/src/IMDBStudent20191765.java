@@ -52,30 +52,31 @@ public class IMDBStudent20191765 {
 	public static class IMDBReducer extends Reducer<Text, Text, Text, Text> {
 
 		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-			// Text reduce_key = new Text();
-			// Text reduce_result = new Text();
-			// String desc = "";
+			Text reduce_key = new Text();
+			Text reduce_result = new Text();
+			String desc = "";
+			String o_value = "";
 			// int sum = 0;
-			// ArrayList<String> buffer = new ArrayList<>();
+			ArrayList<String> buffer = new ArrayList<>();
 			
 			for (Text v : values) {
-				// String[] str = v.toString().split(",");
-				// if (str[0].equals("A")) {
-				// 	desc = str[1];
-				// }
-				// else {
-				// 	buffer.add(str[1]);
-				// }
-				context.wirte(key, v);
+				String[] str = v.toString().split(",");
+				if (str[0].equals("A")) {
+					desc = str[1];
+				}
+				else {
+					buffer.add(str[1]);
+				}
 			}
-			// if (desc.length() != 0) {
-			// 	for (String s : buffer) {
-			// 		sum += Integer.parseInt(s);
-			// 	}
-			// 	reduce_key.set(desc);
-			// 	reduce_result.set(Double.toString(sum / buffer.size()));
-			// 	context.write(reduce_key, reduce_result);
-			// }
+			if (desc.length() != 0) {
+				for (String s : buffer) {
+					// sum += Integer.parseInt(s);
+					o_value += s;
+				}
+				reduce_key.set(desc);
+				reduce_result.set(o_value);
+				context.write(reduce_key, reduce_result);
+			}
 		}
 	}
 	
