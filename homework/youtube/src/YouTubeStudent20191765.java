@@ -43,37 +43,31 @@ public class YouTubeStudent20191765 {
 		}
 	}
 
-	public static class YouTubeMapper extends Mapper<LongWritable, Text, Text, NullWritable> {
-		private PriorityQueue<Youtube> queue;
-		private Comparator<Youtube> comp = new YoutubeComparator();
-		private int topK;
+	public static class YouTubeMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
+		private Text okey = new Text();
+		private DoubleWritable ovalue = new DoubleWritable();
 
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String[] strs = value.toString().split("\\|");
-			insertYoutube(queue, strs[3], Double.parseDouble(strs[6]), topK);
+			okey.set(strs[3]);
+			ovalue.set(Double.parseDouble(strs[6]));
+			context.write(okey, ovalue);
 		}
-
-		protected void setup(Context context) throws IOException, InterruptedException {
-			Configuration conf = context.getConfiguration();
-			topK = conf.getInt("topK", -1);
-			queue = new PriorityQueue<Youtube>(topK, comp);
-		}
-
-		protected void cleanup(Context context) throws IOException, InterruptedException {
-			while(queue.size() != 0) {
-				Youtube Youtube = (Youtube)queue.remove();
-				context.write(new Text(Youtube.getString()), NullWritable.get());
-			}
-		}
+		
 	}
 
-	public static class YouTubeReducer extends Reducer<Text, NullWritable, Text, NullWritable> {
+	public static class YouTubeReducer extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
 		private int topK;
 		private PriorityQueue<Youtube> queue;
 		private Comparator<Youtube> comp = new YoutubeComparator();
-		public void reduce(Text key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
-			StringTokenizer itr = new StringTokenizer(key.toString(), " ");
-			insertEmp(queue, itr.nextToken(), Double.parseDouble(itr.nextToken()), topK);
+		double sum = 0.0;
+		int cnt = 0;
+		public void reduce(Text key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
+			for (DoubleWritable val : values) {
+				sum += val.get();
+				cnt++;
+			}
+			insertEmp(queue, key.toString(), sum / cnt, topK);
 		}
 
 		protected void setup(Context context) throws IOException, InterruptedException {
@@ -85,7 +79,7 @@ public class YouTubeStudent20191765 {
 		protected void cleanup(Context context) throws IOException, InterruptedException {
 			while(queue.size() != 0) {
 				Youtube Youtube = (Youtube)queue.remove();
-				context.write(new Text(Youtube.getString()), NullWritable.get());
+				context.write(new Text(Youtube.cat), new DoubleWritable(Youtube.avg));
 			}
 		}
 	}
@@ -104,7 +98,7 @@ public class YouTubeStudent20191765 {
 		job.setMapperClass(YouTubeMapper.class);
 		job.setReducerClass(YouTubeReducer.class);
 		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(NullWritable.class);
+		job.setOutputValueClass(DoubleWritable.class);
 		FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 		FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 
