@@ -10,8 +10,35 @@ import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.lib.output.*;
 import org.apache.hadoop.util.GenericOptionsParser;
 
+
 public class IMDBStudent20191765 {
 	
+	class Movie {
+		public String name;
+		public Double avg;
+
+		public Movie(String name, Double avg) {
+			this.name = name;
+			this.avg = avg;
+		}
+	}
+
+	public static class MovieComparator implements Comparator<Movie> {
+		public int compare(Movie x, Movie y) {
+			return Double.compare(x.avg, y.avg);
+		}
+	}
+
+	public static void insertMovie(PriorityQueue q, String name, Double avg) {
+		Movie head = (Movie)q.peek();
+		if (q.size() < topK || Double.compare(head.avg, avg) < 0) {
+			Movie movie = new Movie(name, avg);
+			q.add(avg);
+			if (q.size() > topK)
+				q.remove();
+		}
+	}
+
 	public static class IMDBMapper extends Mapper<LongWritable, Text, Text, Text> {
 		boolean fileA = true;
 
@@ -50,7 +77,8 @@ public class IMDBStudent20191765 {
 	}
 
 	public static class IMDBReducer extends Reducer<Text, Text, Text, Text> {
-
+		private PriorityQueue<Movie> queue;
+		private Comparator<Movie> comp = new MovieComparator();
 		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 			Text reduce_key = new Text();
 			Text reduce_result = new Text();
@@ -58,7 +86,7 @@ public class IMDBStudent20191765 {
 			String o_value = "";
 			int sum = 0;
 			ArrayList<String> buffer = new ArrayList<>();
-			
+
 			for (Text v : values) {
 				String[] str = v.toString().split("::");
 				if (str[0].equals("A")) {
@@ -72,9 +100,20 @@ public class IMDBStudent20191765 {
 				for (String s : buffer) {
 					sum += Integer.parseInt(s);
 				}
-				reduce_key.set(desc);
-				reduce_result.set(Double.toString(sum / (float)buffer.size()));
-				context.write(reduce_key, reduce_result);
+				insertMovie(queue, desc, sum / (float)buffer.size());
+			}
+		}
+
+		protected void setup(Context context) throws IOException, InterruptedException {
+			Configuration conf = context.getConfiguration();
+			topK = conf.getInt("topK", -1);
+			queue = new PriorityQueue<Movie>(topK, comp);
+		}
+
+		protected void cleanup(Context context) throws IOException, InterruptedException {
+			while(queue.size() != 0) {
+				Movie movie = (Movie)queue.remove();
+				context.write(new Text(movie.name), new Text(Double.toString(movie.avg)));
 			}
 		}
 	}
