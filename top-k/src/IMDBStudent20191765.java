@@ -13,7 +13,7 @@ import org.apache.hadoop.util.GenericOptionsParser;
 
 public class IMDBStudent20191765 {
 	
-	class Movie {
+	static class Movie {
 		public String name;
 		public Double avg;
 
@@ -29,11 +29,11 @@ public class IMDBStudent20191765 {
 		}
 	}
 
-	public static void insertMovie(PriorityQueue q, String name, Double avg) {
+	public static void insertMovie(PriorityQueue q, String name, Double avg, int topK) {
 		Movie head = (Movie)q.peek();
 		if (q.size() < topK || Double.compare(head.avg, avg) < 0) {
 			Movie movie = new Movie(name, avg);
-			q.add(avg);
+			q.add(movie);
 			if (q.size() > topK)
 				q.remove();
 		}
@@ -77,6 +77,7 @@ public class IMDBStudent20191765 {
 	}
 
 	public static class IMDBReducer extends Reducer<Text, Text, Text, Text> {
+		private int topK;
 		private PriorityQueue<Movie> queue;
 		private Comparator<Movie> comp = new MovieComparator();
 		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
@@ -100,7 +101,7 @@ public class IMDBStudent20191765 {
 				for (String s : buffer) {
 					sum += Integer.parseInt(s);
 				}
-				insertMovie(queue, desc, sum / (float)buffer.size());
+				insertMovie(queue, desc, sum / (double)buffer.size(), topK);
 			}
 		}
 
