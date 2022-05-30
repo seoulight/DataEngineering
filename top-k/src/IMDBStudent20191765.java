@@ -22,16 +22,21 @@ public class IMDBStudent20191765 {
 			String joinKey = "";
 			String o_value = "";
 			if (fileA) {
-				joinKey = strs[0];
-				o_value = "A," + strs[1];
+				if (strs[2].indexOf("Fantasy") != -1) {
+					joinKey = strs[0];
+					o_value = "A," + strs[1];
+					outputKey.set(joinKey);
+					outputValue.set(o_value);
+					context.write(outputKey, outputValue);
+				}
 			}
 			else {
 				joinKey = strs[1];
 				o_value = "B," + strs[2];
+				outputKey.set(joinKey);
+				outputValue.set(o_value);
+				context.write(outputKey, outputValue);
 			}
-			outputKey.set(joinKey);
-			outputValue.set(o_value);
-			context.write(outputKey, outputValue);
 		}
 
 		protected void setup(Context context) throws IOException, InterruptedException {
@@ -44,26 +49,33 @@ public class IMDBStudent20191765 {
 		}
 	}
 
-	public static class IMDBReducer extends Reducer<Text, Text, Text, DoubleWritable> {
+	public static class IMDBReducer extends Reducer<Text, Text, Text, Text> {
 
 		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-			Text reduce_key = new Text();
-			DoubleWritable reduce_result = new DoubleWritable();
-			double sum = 0.0;
-			int	cnt = 0;
+			// Text reduce_key = new Text();
+			// Text reduce_result = new Text();
+			// String desc = "";
+			// int sum = 0;
+			// ArrayList<String> buffer = new ArrayList<>();
+			
 			for (Text v : values) {
-				String file_type;
-				file_type = v.toString().split(",")[0];
-				if (file_type.equals("A")) {
-					reduce_key.set(v.toString().split(",")[1]);
-				}
-				else {
-					cnt++;
-					sum += Double.parseDouble(v.toString().split(",")[1]);
-				}
+				// String[] str = v.toString().split(",");
+				// if (str[0].equals("A")) {
+				// 	desc = str[1];
+				// }
+				// else {
+				// 	buffer.add(str[1]);
+				// }
+				context.wirte(key, v);
 			}
-			reduce_result.set(sum / cnt);
-			context.write(reduce_key, reduce_result);
+			// if (desc.length() != 0) {
+			// 	for (String s : buffer) {
+			// 		sum += Integer.parseInt(s);
+			// 	}
+			// 	reduce_key.set(desc);
+			// 	reduce_result.set(Double.toString(sum / buffer.size()));
+			// 	context.write(reduce_key, reduce_result);
+			// }
 		}
 	}
 	
@@ -81,7 +93,7 @@ public class IMDBStudent20191765 {
 		job.setMapperClass(IMDBMapper.class);
 		job.setReducerClass(IMDBReducer.class);
 		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(DoubleWritable.class);
+		job.setOutputValueClass(Text.class);
 		FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 		FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 
