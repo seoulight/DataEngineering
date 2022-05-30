@@ -51,7 +51,6 @@ public class IMDBStudent20191765 {
 			DoubleWritable reduce_result = new DoubleWritable();
 			double sum = 0.0;
 			int	cnt = 0;
-			ArrayList<String> buffer = new ArrayList<String>();
 			for (Text v : values) {
 				String file_type;
 				file_type = v.toString().split(",")[0];
