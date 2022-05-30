@@ -46,15 +46,15 @@ public class IMDBStudent20191765 {
 
 	public static class IMDBReducer extends Reducer<Text, Text, Text, DoubleWritable> {
 
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+		public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 			Text reduce_key = new Text();
-			Text reduce_result = new Text();
+			DoubleWritable reduce_result = new DoubleWritable();
 			double sum = 0.0;
 			int	cnt = 0;
 			ArrayList<String> buffer = new ArrayList<String>();
 			for (Text v : values) {
 				String file_type;
-				file_type = v.toString()[0];
+				file_type = v.toString().split(",")[0];
 				if (file_type.equals("A")) {
 					reduce_key.set(v.toString().split(",")[1]);
 				}
