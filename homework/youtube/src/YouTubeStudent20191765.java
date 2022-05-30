@@ -73,7 +73,7 @@ public class YouTubeStudent20191765 {
 		private Comparator<Youtube> comp = new YoutubeComparator();
 		public void reduce(Text key, Iterable<NullWritable> values, Context context) throws IOException, InterruptedException {
 			StringTokenizer itr = new StringTokenizer(key.toString(), " ");
-			insertEmp(queue, itr.nextToken(), Double.parseDouble(itr.nextToken()), topK);
+			insertYoutube(queue, itr.nextToken(), Double.parseDouble(itr.nextToken()), topK);
 		}
 
 		protected void setup(Context context) throws IOException, InterruptedException {
