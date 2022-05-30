@@ -66,7 +66,7 @@ public class IMDBStudent20191765 {
 				// else {
 				// 	buffer.add(str[1]);
 				// }
-				context.wirte(key, v);
+				context.write(key, v);
 			}
 			// if (desc.length() != 0) {
 			// 	for (String s : buffer) {
