@@ -15,9 +15,9 @@ public class YouTubeStudent20191765 {
 	
 	public static class Youtube {
 		public String cat;
-		public Double avg;
+		public float avg;
 
-		public Youtube(String cat, Double avg) {
+		public Youtube(String cat, float avg) {
 			this.cat = cat;
 			this.avg = avg;
 		}
@@ -29,13 +29,13 @@ public class YouTubeStudent20191765 {
 
 	public static class YoutubeComparator implements Comparator<Youtube> {
 		public int compare(Youtube x, Youtube y) {
-			return Double.compare(x.avg, y.avg);
+			return Float.compare(x.avg, y.avg);
 		}
 	}
 
-	public static void insertYoutube(PriorityQueue q, String cat, Double avg, int topK) {
+	public static void insertYoutube(PriorityQueue q, String cat, Float avg, int topK) {
 		Youtube head = (Youtube)q.peek();
-		if (q.size() < topK || Double.compare(head.avg, avg) < 0) {
+		if (q.size() < topK || Float.compare(head.avg, avg) < 0) {
 			Youtube Youtube = new Youtube(cat, avg);
 			q.add(Youtube);
 			if (q.size() > topK)
@@ -43,27 +43,27 @@ public class YouTubeStudent20191765 {
 		}
 	}
 
-	public static class YouTubeMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
+	public static class YouTubeMapper extends Mapper<LongWritable, Text, Text, FloatWritable> {
 		private Text okey = new Text();
-		private DoubleWritable ovalue = new DoubleWritable();
+		private FloatWritable ovalue = new FloatWritable();
 
 		public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 			String[] strs = value.toString().split("\\|");
 			okey.set(strs[3]);
-			ovalue.set(Double.parseDouble(strs[6]));
+			ovalue.set(Float.parseFloat(strs[6]));
 			context.write(okey, ovalue);
 		}
 		
 	}
 
-	public static class YouTubeReducer extends Reducer<Text, DoubleWritable, Text, DoubleWritable> {
+	public static class YouTubeReducer extends Reducer<Text, FloatWritable, Text, FloatWritable> {
 		private int topK;
 		private PriorityQueue<Youtube> queue;
 		private Comparator<Youtube> comp = new YoutubeComparator();
-		double sum = 0.0;
+		float sum = 0;
 		int cnt = 0;
-		public void reduce(Text key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
-			for (DoubleWritable val : values) {
+		public void reduce(Text key, Iterable<FloatWritable> values, Context context) throws IOException, InterruptedException {
+			for (FloatWritable val : values) {
 				sum += val.get();
 				cnt++;
 			}
@@ -79,7 +79,7 @@ public class YouTubeStudent20191765 {
 		protected void cleanup(Context context) throws IOException, InterruptedException {
 			while(queue.size() != 0) {
 				Youtube Youtube = (Youtube)queue.remove();
-				context.write(new Text(Youtube.cat), new DoubleWritable(Youtube.avg));
+				context.write(new Text(Youtube.cat), new FloatWritable(Youtube.avg));
 			}
 		}
 	}
@@ -98,7 +98,7 @@ public class YouTubeStudent20191765 {
 		job.setMapperClass(YouTubeMapper.class);
 		job.setReducerClass(YouTubeReducer.class);
 		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(DoubleWritable.class);
+		job.setOutputValueClass(FloatWritable.class);
 		FileInputFormat.addInputPath(job, new Path(otherArgs[0]));
 		FileOutputFormat.setOutputPath(job, new Path(otherArgs[1]));
 
