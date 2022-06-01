@@ -15,9 +15,9 @@ public class IMDBStudent20191765 {
 	
 	static class Movie {
 		public String name;
-		public Double avg;
+		public float avg;
 
-		public Movie(String name, Double avg) {
+		public Movie(String name, float avg) {
 			this.name = name;
 			this.avg = avg;
 		}
@@ -25,11 +25,11 @@ public class IMDBStudent20191765 {
 
 	public static class MovieComparator implements Comparator<Movie> {
 		public int compare(Movie x, Movie y) {
-			return Double.compare(x.avg, y.avg);
+			return Float.compare(x.avg, y.avg);
 		}
 	}
 
-	public static void insertMovie(PriorityQueue q, String name, Double avg, int topK) {
+	public static void insertMovie(PriorityQueue q, String name, Float avg, int topK) {
 		Movie head = (Movie)q.peek();
 		if (q.size() < topK || Double.compare(head.avg, avg) < 0) {
 			Movie movie = new Movie(name, avg);
@@ -85,7 +85,7 @@ public class IMDBStudent20191765 {
 			Text reduce_result = new Text();
 			String desc = "";
 			String o_value = "";
-			int sum = 0;
+			float sum = 0;
 			ArrayList<String> buffer = new ArrayList<>();
 
 			for (Text v : values) {
@@ -99,9 +99,9 @@ public class IMDBStudent20191765 {
 			}
 			if (desc.length() != 0 && buffer.size() != 0) {
 				for (String s : buffer) {
-					sum += Integer.parseInt(s);
+					sum += Float.parseFloat(s);
 				}
-				insertMovie(queue, desc, sum / (double)buffer.size(), topK);
+				insertMovie(queue, desc, sum / buffer.size(), topK);
 			}
 		}
 
@@ -114,7 +114,7 @@ public class IMDBStudent20191765 {
 		protected void cleanup(Context context) throws IOException, InterruptedException {
 			while(queue.size() != 0) {
 				Movie movie = (Movie)queue.remove();
-				context.write(new Text(movie.name), new Text(Double.toString(movie.avg)));
+				context.write(new Text(movie.name), new Text(Float.toString(movie.avg)));
 			}
 		}
 	}
