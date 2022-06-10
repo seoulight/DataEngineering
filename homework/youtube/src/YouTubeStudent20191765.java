@@ -60,9 +60,10 @@ public class YouTubeStudent20191765 {
 		private int topK;
 		private PriorityQueue<Youtube> queue;
 		private Comparator<Youtube> comp = new YoutubeComparator();
-		float sum = 0;
-		int cnt = 0;
+		
 		public void reduce(Text key, Iterable<FloatWritable> values, Context context) throws IOException, InterruptedException {
+			float sum = 0;
+			int cnt = 0;
 			for (FloatWritable val : values) {
 				sum += val.get();
 				cnt++;
