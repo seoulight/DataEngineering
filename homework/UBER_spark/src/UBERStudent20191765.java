@@ -33,7 +33,7 @@ public final class UBERStudent20191765 {
 			String[] infos = s.split(",");
 			String[] date = infos[1].split("/");
 			calendar.set(Calendar.YEAR, Integer.parseInt(date[2]));
-			calendar.set(Calendar.MONTH, Integer.parseInt(date[2]) - 1);
+			calendar.set(Calendar.MONTH, Integer.parseInt(date[0]) - 1);
 			calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(date[1]));
 			
 			return Arrays.asList(infos[0] + "," + week[calendar.get(Calendar.DAY_OF_WEEK) - 1] + "::" + infos[3] + "," + infos[2]).iterator();
@@ -52,7 +52,7 @@ public final class UBERStudent20191765 {
 	Function2<String, String, String> f2 = new Function2<String, String, String>() {
 	public String call(String x, String y) {
 			String[] s1 = x.split(",");
-			String[] s2 = x.split(",");
+			String[] s2 = y.split(",");
 			int[] sum = {0, 0};
 
 			sum[0] = Integer.parseInt(s1[0]) + Integer.parseInt(s2[0]);
